@@ -73,6 +73,7 @@ model = lgb.train(params, train_data, valid_sets=[test_data], num_boost_round=10
 y_pred_prob = model.predict(X_test)
 y_pred = [1 if p > 0.5 else 0 for p in y_pred_prob]
 
+#　予測結果を格納
 accuracy = accuracy_score(y_test, y_pred)
 cm = confusion_matrix(y_test, y_pred)
 

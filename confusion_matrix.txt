@@ -1,0 +1,8 @@
+混合行列
+TN = True Negative（正しく0と予測）
+
+FP = False Positive（誤って1と予測）
+
+FN = False Negative（誤って0と予測）
+
+TP = True Positive（正しく1と予測）

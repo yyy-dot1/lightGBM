@@ -1,0 +1,79 @@
+1. DockerでMySQLコンテナを立ち上げる
+# 新しいMySQLコンテナを作成して起動
+docker run --name my-mysql \
+  -e MYSQL_ROOT_PASSWORD=任意のパスワード \
+  -e MYSQL_DATABASE=mydb \
+  -p 3307:3306 \
+  -d mysql:8
+
+
+--name my-mysql ：コンテナ名
+
+MYSQL_ROOT_PASSWORD ：rootユーザーのパスワード
+
+MYSQL_DATABASE ：起動時に作成されるデータベース
+
+-p 3307:3306 ：ホストの3307ポートをコンテナの3306ポートにマッピング
+
+-d ：バックグラウンドで実行
+
+2. コンテナの起動確認
+docker ps
+
+
+STATUS が Up になっていればOK
+
+PORTS で 0.0.0.0:3307->3306/tcp などが表示される
+
+3. PythonからMySQLに接続
+import mysql.connector
+
+conn = mysql.connector.connect(
+    host="127.0.0.1",
+    port=3307,           # Dockerでマッピングしたポート
+    user="root",
+    password="任意のパスワード",
+    database="mydb"
+)
+
+cursor = conn.cursor()
+cursor.execute("SHOW TABLES;")
+print(cursor.fetchall())
+conn.close()
+
+
+port はコンテナ起動時にホスト側で指定したポート
+
+接続確認のため SHOW TABLES; などでテーブル一覧を確認
+
+4. CSVのデータをMySQLに登録
+import pandas as pd
+
+df = pd.read_csv("sample.csv")
+
+for _, row in df.iterrows():
+    cursor.execute("""
+        INSERT INTO sample (ブログ更新, 試験勉強, コーディング, 環境構築, 読書, `1日の幸福度`)
+        VALUES (%s, %s, %s, %s, %s, %s)
+    """, tuple(row))
+conn.commit()
+
+
+conn.commit() を忘れるとデータが反映されません
+
+5. SQLでデータ確認
+query = "SELECT * FROM sample LIMIT 5"
+df_check = pd.read_sql(query, conn)
+print(df_check)
+
+
+LIMIT で件数を制限して確認可能
+
+停止
+docker stop my-mysql
+
+再開
+docker start my-mysql
+
+ログ確認
+docker logs my-mysql

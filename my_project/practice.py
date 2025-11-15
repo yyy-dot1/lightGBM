@@ -3,7 +3,7 @@ import pandas as pd
 df = pd.read_csv("sample.csv")
 
 #先頭5行
-# print(df.head())
+print(df.head())
 #行数・列数
 # print(df.shape)
 #列名
